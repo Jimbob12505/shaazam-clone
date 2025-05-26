@@ -12,11 +12,11 @@ def main():
     
     mp3_path = sys.argv[1]
 
-    split_audio(mp3_path, 0, 0, "split-mp3")
+    split_audio(mp3_path, 10, 0)
     
     return 0;
 
-def split_audio(input_path, segment_length, overlap, output_path):
+def split_audio(input_path, segment_length, overlap):
     
     if not os.path.exists("split-mp3"):
         os.makedirs("split-mp3")
@@ -25,9 +25,26 @@ def split_audio(input_path, segment_length, overlap, output_path):
     song_name = song_name.split(".")[0] 
     print(song_name)
 
-    if not os.path.exists("split-mp3/" + song_name):
-        os.makedirs("split-mp3/"+song_name)
+    output_path = "split-mp3/" + song_name
 
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
+
+    probe = ffmpeg.probe(input_path)
+    duration = float(probe['format']['duration'])
+
+    step = segment_length - overlap
+    start = 0
+    count = 0
+
+    while start < duration:
+        out_file = os.path.join(output_path, f'chunk_{count:03d}.mp3')
+        ffmpeg.input(input_path, ss=start, t=segment_length).output(out_file, acodec='copy').run(overwrite_output=True)
+        start += step
+        count += 1
+
+    print(f'Done. {count} overlapping segments created.')
+    
     return 0;
 
 if __name__ == '__main__':
