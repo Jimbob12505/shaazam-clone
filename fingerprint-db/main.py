@@ -2,6 +2,8 @@ import os
 import subprocess
 import sys
 import ffmpeg
+from pydub import AudioSegment
+import numpy as np
 
 def main():
     
@@ -14,6 +16,10 @@ def main():
 
     split_audio(mp3_path, 10, 0)
     
+    chunk = AudioSegment.from_file("split-mp3/Doechii-Anxiety/chunk_000.mp3", format="mp3")
+    smoothed_chunk = hamming_window(chunk)
+    smoothed_chunk.export("smoothed_chunk_000.wav", format="wav")
+
     return 0;
 
 def split_audio(input_path, segment_length, overlap):
@@ -46,6 +52,26 @@ def split_audio(input_path, segment_length, overlap):
     print(f'Done. {count} overlapping segments created.')
     
     return 0;
+
+def hamming_window(chunk: AudioSegment) -> AudioSegment:
+
+    samples = np.array(chunk.get_array_of_samples())
+
+    # Reshape audio if stereo
+    if chunk.channels == 2:
+        samples = samples.reshape((-1, 2))
+
+    # Apply hamming window function
+    window = np.hamming(len(samples))
+    
+    if chunk.channels == 2:
+        samples = (samples * window[:, None]).astype(np.int16)
+    else:
+        samples = (samples * window).astype(np.int16)
+
+    # Convert back to AudioSegment
+    processed_chunk = chunk._spawn(samples.tobytes())
+    return processed_chunk
 
 if __name__ == '__main__':
     main()
