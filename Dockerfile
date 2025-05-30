@@ -4,8 +4,7 @@ WORKDIR /usr/local/app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN apt update
-RUN apt install ffmpeg
+RUN apt update && apt install -y ffmpeg
 
 COPY ./fingerprint-db ./
 COPY ./readme.md ./

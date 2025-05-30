@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  shazam-clone:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: shazam-clone-container
+    volumes:
+      - ./fingerprint-db:/usr/local/app/fingerprint-db  # optional for live code sync
+    ports:
+      - "5001:5000"
+    command: tail -f /dev/null  #python3 main.py input-mp3/Doechii-Anxiety.mp3  # update as needed
+    stdin_open: true
+    tty: true
