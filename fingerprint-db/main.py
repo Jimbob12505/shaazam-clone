@@ -9,6 +9,7 @@ import numpy as np
 from hamming import hamming_window
 from split_audio import split_audio
 from scipy.fft import fft
+from plot_ftt import plot_fft_magnitude
 
 def main():
     
@@ -25,26 +26,37 @@ def main():
     smoothed_chunks = apply_hamming_function(output_path)
     print(smoothed_chunks)
 
+    all_fft_results = apply_fft(smoothed_chunks)
+
+    for i, fft_chunk in enumerate(all_fft_results):
+        plot_fft_magnitude(fft_chunk, 44100, output_path, chunk_index=i)
+
     return 0;
 
 def apply_fft(file_array):
     
+    fft_results = []
+    
+
+    print(f"file_array: {file_array}")
+
     for file in file_array:
+        #result = [] 
+        print(f"file: {file}")
 
         chunk = AudioSegment.from_file(file, format="mp3")
         samples = np.array(chunk.get_array_of_samples())
 
-        # Convert chunk to mono if stereo
-        if chunk.channels == 2:
-            samples = samples.reshape((-1, 2))
-            samples = samples.mean(axis=1)
-        
         # Normalizing the chunk
         max_val = np.iinfo(samples.dtype).max
         samples = samples.astype(np.float32) / max_val
-
-
-    return 0;
+        
+        # Perform FFT
+        spectrum = np.abs(fft(samples))[:len(samples)//2]
+        #result.append(spectrum)
+        fft_results.append(spectrum)
+    
+    return fft_results;
 
 def apply_hamming_function(path):
 
