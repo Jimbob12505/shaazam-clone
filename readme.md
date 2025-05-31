@@ -19,7 +19,7 @@
 # TODO
 ## Function 1 - Spectogram Conversion
 - [] Take raw mp3 and convert into spectogram
-    - [] Split audio into overlapping segments
-    - [] Apply Hamming Window function to taper of signal jumps at each split cut of audio to create smooth transition
+    - [X] Split audio into overlapping segments
+    - [X] Apply Hamming Window function to taper of signal jumps at each split cut of audio to create smooth transition
     - [] Apply Fast Fourier Transform to each audio segment
  
